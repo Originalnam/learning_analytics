@@ -1,0 +1,15 @@
+- EDA.ipynb
+    - missing imd_band
+    - missing score
+- EDA.py + verify equality
+- document EDA 
+
+
+
+feat eng
+- relative date for assessments
+- relative weight assessments
+- week_duration (vle)
+- relative submitted
+- studentVle (relative clicks (normalisation), summary per day, number of sessions, weight per resource,...)
+- link assessments in different module presentations to each other
