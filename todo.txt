@@ -1,4 +1,7 @@
-
+create secondary geojson with less granular regions (save original)
+    - create second mapping
+    - DASH: choose geojson based one selected students
+change visual style
 
 
 feat eng

@@ -11,6 +11,10 @@ seaborn = "*"
 plotly = "*"
 nbformat = "*"
 scipy = "*"
+dash = "*"
+dash-bootstrap-components = "*"
+jupyter-dash = "*"
+geopandas = "*"
 
 [dev-packages]
 
