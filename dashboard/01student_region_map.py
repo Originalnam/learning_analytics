@@ -1,64 +1,50 @@
-import json
-from dash import Dash, html, dcc, callback, Output, Input
-import plotly.express as px
+# add project root to Python pathimport sys
+import sys
+from pathlib import Path
+project_root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(project_root))
+
+import os
 import pandas as pd
+import geopandas as gpd
 from urllib.request import urlopen
-from dashboard_functions import get_map_data
+from general_functions import load_data
 
-app = Dash(__name__)
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
-with open('./data/allregions_grouped.geojson', 'r') as file:
-    geojson_regions_grouped = json.load(file)
+# load data
+load_path = os.path.join(script_dir, '../data/', 'EDA/')
+dfs = load_data(load_path)
 
-student_data = get_map_data()    
-print(student_data)
+# load geoJSON files
+gdfGB = gpd.GeoDataFrame.from_file('https://raw.githubusercontent.com/martinjc/UK-GeoJSON/refs/heads/master/json/electoral/gb/eer.json')
+gdfGB.rename(columns={"EER13NM": "region"}, inplace=True)
+gdfNI = gpd.GeoDataFrame.from_file('https://raw.githubusercontent.com/martinjc/UK-GeoJSON/refs/heads/master/json/electoral/ni/eer.json')
+gdfNI.rename(columns={"NAME": "region"}, inplace=True)
 
-# Layout
-app.layout = html.Div([
-    # Dropdown for selection
-    html.Div([
-        dcc.RadioItems(
-            id='map-selector', 
-            options=[
-                {'label': 'Regions', 'value': 'regions'},
-                {'label': 'Grouped regions', 'value': 'groups'}
-            ],
-            value="groups",
-            inline=True
-            )
-        ]),
-    
-    # Graph
-    dcc.Graph(id='choropleth-map')
-])
+# combine geoJSON and group regions
+regions_mapping_combined = {'North East': 'North Region',
+                            'Eastern': 'South Region',
+                            'Scotland': 'Scotland',
+                            'North West': 'North Region',
+                            'South East': 'South Region',
+                            'West Midlands': 'West Midlands',
+                            'Wales': 'Wales',
+                            'Outline of Northern Ireland': 'Outline of Northern Ireland',
+                            'South West': 'South Region',
+                            'East Midlands': 'East Midlands',
+                            'Yorkshire and The Humber': 'North Region',
+                            'London': 'South Region'
+                            }
+combined_gdf = gpd.GeoDataFrame(pd.concat([gdfGB, gdfNI], ignore_index=True))
+combined_gdf.loc[:,'group'] = combined_gdf['region'].map(regions_mapping_combined)
+combined_gdf.drop(['EER13CD', 'EER13CDO', 'ID', 'Area_SqKM','OBJECTID'], axis=1, inplace=True)
 
-@callback(
-    Output('choropleth-map', 'figure'),
-    Input('map-selector', 'value')
-)
-def update_map(selected_data):
-    title = 'Regions Map'
+grouped_gdf = combined_gdf.dissolve(by='group').reset_index()
+grouped_gdf['region'] = grouped_gdf['group']
+grouped_gdf.drop('group', axis=1, inplace=True)
 
-    # Create the figure
-    fig = px.choropleth_map(student_data, geojson=geojson_regions_grouped, 
-                            locations='region', 
-                            color='value', 
-                            featureidkey="properties.region",
-                            color_continuous_scale="brwnyl",
-                            range_color=(min(student_data['value']), max(student_data['value'])),
-                            map_style="carto-positron",
-                            zoom=4, center = {"lat": 55.6187, "lon": -1.3698},
-                            opacity=0.5,
-                            labels={'unemp':'unemployment rate'}
-                            )
-    
-    fig.update_layout(
-        margin={"r": 0, "t": 30, "l": 0, "b": 0},
-        title=title
-    )
-    
-    return fig
-
-if __name__ == '__main__':
-    app.run_server(debug=True)
-
+# save geoJSON
+write_path = os.path.join(script_dir, '../data/', 'dashboard/', 'allregions_grouped.geojson')
+grouped_gdf.to_file(write_path, 
+                    driver='GeoJSON')

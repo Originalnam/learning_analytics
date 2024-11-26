@@ -1,9 +1,8 @@
-create secondary geojson with less granular regions (save original)
 
-add manipluations to .py (geojson)
-change visual style
+- dashboard layout
 
-layout
+Create one file to run all manipulations needed for dashboard at once
+
 
 feat eng
 - relative date for assessments
