@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 # add the project directory to sys.path
-project_root = os.path.dirname(os.path.abspath("__file__"))
+project_root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(project_root))
 
 def load_data(path= None):

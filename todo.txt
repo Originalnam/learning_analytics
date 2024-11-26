@@ -1,11 +1,9 @@
 create secondary geojson with less granular regions (save original)
-    - create second mapping
-    - DASH: choose geojson based one selected students
-    - rename regions (currently uses Marti nnames, not data)
-use data from csv files (in dashboard folder?)
+
 add manipluations to .py (geojson)
 change visual style
 
+layout
 
 feat eng
 - relative date for assessments
