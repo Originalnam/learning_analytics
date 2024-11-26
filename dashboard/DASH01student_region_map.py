@@ -48,8 +48,7 @@ def update_map(selected_data):
                             range_color=(min(student_data['value']), max(student_data['value'])),
                             map_style="carto-positron",
                             zoom=4, center = {"lat": 55.6187, "lon": -1.3698},
-                            opacity=0.5,
-                            labels={'unemp':'unemployment rate'}
+                            opacity=0.5
                             )
     
     fig.update_layout(
